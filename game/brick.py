@@ -5,10 +5,10 @@ from game import settings
 
 class Bricks:
     def __init__(self, game):
-        brick = Brick(400, 300, settings.BRICK_COLOR)
         self.bricks = []
         self.rows, self.cols = self._calculate_bricks_rows_and_cols()
         self.create_bricks()
+
     def _calculate_bricks_rows_and_cols(self):
         screen_width = settings.SCREEN_WIDTH
         screen_height = settings.SCREEN_HEIGHT
@@ -50,12 +50,13 @@ class Bricks:
             brick.reset()
 
 class Brick:
-    def __init__(self, x, y, color, glow_color=None):
+    def __init__(self, x, y, color):
+        self.x = x
+        self.y = y
         width, height = settings.BRICK_WIDTH, settings.BRICK_HEIGHT
         self.rect = pygame.Rect(x, y, width, height)
         self.color = color
-        self.glow_color = glow_color or color
+
     def draw(self, surface):
         # 👇 增加更多 glow layer 
         pygame.draw.rect(surface, self.color, self.rect, border_radius=2)
-
