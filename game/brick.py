@@ -5,6 +5,7 @@ from game import settings
 
 class Bricks:
     def __init__(self, game):
+        self.game = game
         self.bricks = []
         self.rows, self.cols = self._calculate_bricks_rows_and_cols()
         self.create_bricks()
@@ -32,7 +33,7 @@ class Bricks:
                 x = col * (settings.BRICK_WIDTH + padding) + padding
                 y = row * (settings.BRICK_HEIGHT + padding) + padding
 
-                brick = Brick(x, y, settings.BRICK_COLOR)
+                brick = ExplosiveBrick(self.game, row, col, x, y)
                 self.bricks.append(brick)
 
     def draw(self, surface):
@@ -50,7 +51,10 @@ class Bricks:
             brick.reset()
 
 class Brick:
-    def __init__(self, x, y, color):
+    def __init__(self, game, row, col, x, y, color):
+        self.game = game
+        self.row = row
+        self.col = col
         self.x = x
         self.y = y
         width, height = settings.BRICK_WIDTH, settings.BRICK_HEIGHT
@@ -60,3 +64,8 @@ class Brick:
     def draw(self, surface):
         # 👇 增加更多 glow layer 
         pygame.draw.rect(surface, self.color, self.rect, border_radius=2)
+
+
+class ExplosiveBrick(Brick):
+    def __init__(self, game, row, col, x, y):
+        super().__init__(game, row, col, x, y, settings.RED)
