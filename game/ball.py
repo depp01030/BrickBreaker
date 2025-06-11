@@ -5,6 +5,7 @@ from game import settings
 
 class Ball:
     def __init__(self, game):
+        self.game = game
         self.screen = game.screen
         self.radius = 10
         
@@ -22,8 +23,9 @@ class Ball:
         
         # 球的移動速度與方向
         self.speed = 5
-        self.dx = self.speed * math.cos(math.radians(45))  # 45度角發射
-        self.dy = -self.speed * math.sin(math.radians(45))  # 負值表示向上移動
+        angle = math.radians(45)
+        self.dx = self.speed * math.cos(angle)  # 45度角發射
+        self.dy = -self.speed * math.sin(angle)  # 負值表示向上移動
         
         # 球的顏色
         self.color = (255, 255, 0)  # 黃色
@@ -40,23 +42,27 @@ class Ball:
     def check_wall_collision(self):
         # 檢查左牆碰撞
         if self.rect.left <= 0:
+            self.rect.left = 0
+            self.x = self.rect.centerx
             self.dx = abs(self.dx)  # 反彈向右
-            self.x = self.radius  # 防止卡在牆內
         
         # 檢查右牆碰撞
         elif self.rect.right >= settings.SCREEN_WIDTH:
+            self.rect.right = settings.SCREEN_WIDTH
+            self.x = self.rect.centerx
             self.dx = -abs(self.dx)  # 反彈向左
-            self.x = settings.SCREEN_WIDTH - self.radius  # 防止卡在牆內
         
         # 檢查上牆碰撞
         if self.rect.top <= 0:
+            self.rect.top = 0
+            self.y = self.rect.centery
             self.dy = abs(self.dy)  # 反彈向下
-            self.y = self.radius  # 防止卡在牆內
         
         # 檢查下牆碰撞 (可以加入遊戲結束邏輯)
         elif self.rect.bottom >= settings.SCREEN_HEIGHT:
+            self.rect.bottom = settings.SCREEN_HEIGHT
+            self.y = self.rect.centery
             self.dy = -abs(self.dy)  # 反彈向上
-            self.y = settings.SCREEN_HEIGHT - self.radius
             # 這裡可以加入失敗或生命減少的邏輯
 
     def check_paddle_collision(self, paddle):
@@ -93,6 +99,10 @@ class Ball:
                     self.dx = -self.dx  # 水平反彈
                 else:
                     self.dy = -self.dy  # 垂直反彈
+
+                # 產生粒子特效
+                if hasattr(self.game, 'spawn_particle_effect'):
+                    self.game.spawn_particle_effect(brick.rect.center, brick.color)
                 
                 # 從磚塊列表中移除被碰撞的磚塊
                 bricks.bricks.remove(brick)

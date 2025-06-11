@@ -6,6 +6,7 @@ from game import settings
 from game.paddle import Paddle
 from game.ball import Ball
 from game.brick import Bricks
+from game.particle_effect import ParticleEffect
 from game import InfoUi
 class Game:
     def __init__(self):
@@ -20,9 +21,13 @@ class Game:
         self.paddle = Paddle(self)
         self.ball = Ball(self)
         self.bricks = Bricks(self)
+        self.particle_effects = []
 
         self.clock = pygame.time.Clock()
         self.running = True
+
+    def spawn_particle_effect(self, pos, color):
+        self.particle_effects.append(ParticleEffect(pos, color))
 
     def run(self):
         while self.running:
@@ -40,7 +45,12 @@ class Game:
         self.ball.move()
         self.ball.check_wall_collision()
         self.ball.check_paddle_collision(self.paddle)
-        self.ball.check_bricks_collision(self.bricks) 
+        self.ball.check_bricks_collision(self.bricks)
+
+        for effect in self.particle_effects[:]:
+            effect.update()
+            if not effect.active:
+                self.particle_effects.remove(effect)
         
         self.info_ui.update()
 
@@ -49,6 +59,8 @@ class Game:
         self.paddle.draw(self.screen)
         self.ball.draw(self.screen)
         self.bricks.draw(self.screen)
+        for effect in self.particle_effects:
+            effect.draw(self.screen)
 
         self.info_ui.draw(self.screen)
 
