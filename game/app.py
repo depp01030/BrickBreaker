@@ -2,11 +2,12 @@
 
 import pygame
 import sys
+import random
 from game import settings
 from game.paddle import Paddle
 from game.ball import Ball
 from game.brick import Bricks
-from game.particle_effect import ParticleEffect
+from game.particle_effect import ParticleEffect, DustParticleEffect
 from game import InfoUi
 class Game:
     def __init__(self):
@@ -22,12 +23,22 @@ class Game:
         self.ball = Ball(self)
         self.bricks = Bricks(self)
         self.particle_effects = []
+        self.shake_frames = 0
+        self.shake_magnitude = 0
+        self.draw_surface = pygame.Surface((settings.SCREEN_WIDTH, settings.SCREEN_HEIGHT))
 
         self.clock = pygame.time.Clock()
         self.running = True
 
     def spawn_particle_effect(self, pos, color):
         self.particle_effects.append(ParticleEffect(pos, color))
+
+    def spawn_dust_effect(self, pos, color=(180, 180, 180)):
+        self.particle_effects.append(DustParticleEffect(pos, color))
+
+    def trigger_shake(self, frames=5, magnitude=5):
+        self.shake_frames = frames
+        self.shake_magnitude = magnitude
 
     def run(self):
         while self.running:
@@ -55,15 +66,23 @@ class Game:
         self.info_ui.update()
 
     def _update_screen(self):
-        self.screen.fill(settings.BACKGROUND_COLOR)
-        self.paddle.draw(self.screen)
-        self.ball.draw(self.screen)
-        self.bricks.draw(self.screen)
+        self.draw_surface.fill(settings.BACKGROUND_COLOR)
+        self.paddle.draw(self.draw_surface)
+        self.ball.draw(self.draw_surface)
+        self.bricks.draw(self.draw_surface)
         for effect in self.particle_effects:
-            effect.draw(self.screen)
+            effect.draw(self.draw_surface)
 
-        self.info_ui.draw(self.screen)
+        self.info_ui.draw(self.draw_surface)
 
+        offset_x = offset_y = 0
+        if self.shake_frames > 0:
+            offset_x = random.randint(-self.shake_magnitude, self.shake_magnitude)
+            offset_y = random.randint(-self.shake_magnitude, self.shake_magnitude)
+            self.shake_frames -= 1
+
+        self.screen.fill(settings.BACKGROUND_COLOR)
+        self.screen.blit(self.draw_surface, (offset_x, offset_y))
         pygame.display.flip()
         self.clock.tick(settings.FPS)
 

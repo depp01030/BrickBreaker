@@ -3,11 +3,11 @@ import random
 import math
 
 class Particle:
-    def __init__(self, pos, color):
+    def __init__(self, pos, color, angle=None, speed_range=(1, 3)):
         self.x, self.y = pos
         self.radius = random.randint(2, 4)
-        self.angle = random.uniform(0, 2 * math.pi)
-        self.speed = random.uniform(1, 3)
+        self.angle = angle if angle is not None else random.uniform(0, 2 * math.pi)
+        self.speed = random.uniform(*speed_range)
         self.color = color
         self.lifetime = random.randint(20, 40)
 
@@ -37,3 +37,15 @@ class ParticleEffect:
     def draw(self, surface):
         for p in self.particles:
             p.draw(surface)
+
+
+class DustParticleEffect(ParticleEffect):
+    """Particles falling downward to simulate debris/dust."""
+
+    def __init__(self, pos, color, amount=15):
+        super().__init__(pos, color, amount)
+        # Override particle directions so that dust falls downward
+        for p in self.particles:
+            downward_angle = random.uniform(math.pi * 0.7, math.pi * 1.3)
+            p.angle = downward_angle
+            p.speed = random.uniform(1, 2)

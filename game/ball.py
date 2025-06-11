@@ -29,6 +29,7 @@ class Ball:
         
         # 球的顏色
         self.color = (255, 255, 0)  # 黃色
+        self.damage = 10
 
     def move(self):
         # 更新球的位置
@@ -100,14 +101,13 @@ class Ball:
                 else:
                     self.dy = -self.dy  # 垂直反彈
 
-                # 產生粒子特效
                 if hasattr(self.game, 'spawn_particle_effect'):
                     self.game.spawn_particle_effect(brick.rect.center, brick.color)
+
+                brick.hit(self.damage)
+                if hasattr(self.game, 'trigger_shake'):
+                    self.game.trigger_shake()
                 
-                # 從磚塊列表中移除被碰撞的磚塊
-                bricks.bricks.remove(brick)
-                
-                # 每次只處理一個碰撞，避免穿過多個磚塊
                 break
 
     def draw(self, screen):
