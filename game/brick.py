@@ -107,7 +107,7 @@ class Bricks:
                 elif row % 6 == 1:
                     brick = ThickBrick(self.game, row, col, x, y)
                 elif row % 6 == 2:
-                    brick = ExplosiveBrick(self.game, row, col, x, y)
+                    brick = ExplosiveBrick(self.game, row, col, x, y, settings.RED)
                 else:
                     brick = Brick(self.game, row, col, x, y, settings.get_random_color())
                 self.bricks.append(brick)
